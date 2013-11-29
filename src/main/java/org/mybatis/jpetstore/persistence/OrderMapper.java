@@ -22,16 +22,16 @@ import org.mybatis.jpetstore.domain.Order;
 
 /**
  * @author Eduardo Macarron
- *
+ * 
  */
 public interface OrderMapper {
 
-  List<Order> getOrdersByUsername(String username);
+    List<Order> getOrdersByUsername(String username);
 
-  Order getOrder(int orderId);
-  
-  void insertOrder(Order order);
-  
-  void insertOrderStatus(Order order);
+    Order getOrder(int orderId);
+
+    void insertOrder(Order order);
+
+    void insertOrderStatus(Order order);
 
 }

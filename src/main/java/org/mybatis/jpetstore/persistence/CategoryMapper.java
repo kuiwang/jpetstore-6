@@ -22,12 +22,12 @@ import org.mybatis.jpetstore.domain.Category;
 
 /**
  * @author Eduardo Macarron
- *
+ * 
  */
 public interface CategoryMapper {
 
-  List<Category> getCategoryList();
+    List<Category> getCategoryList();
 
-  Category getCategory(String categoryId);
+    Category getCategory(String categoryId);
 
 }

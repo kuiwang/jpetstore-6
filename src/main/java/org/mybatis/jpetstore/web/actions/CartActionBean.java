@@ -32,93 +32,95 @@ import org.mybatis.jpetstore.service.CatalogService;
 
 /**
  * @author Eduardo Macarron
- *
+ * 
  */
 @SessionScope
 public class CartActionBean extends AbstractActionBean {
 
-  private static final long serialVersionUID = -4038684592582714235L;
+    private static final long serialVersionUID = -4038684592582714235L;
 
-  private static final String VIEW_CART = "/WEB-INF/jsp/cart/Cart.jsp";
-  private static final String CHECK_OUT = "/WEB-INF/jsp/cart/Checkout.jsp";
+    private static final String VIEW_CART = "/WEB-INF/jsp/cart/Cart.jsp";
 
-  @SpringBean
-  private transient CatalogService catalogService;
+    private static final String CHECK_OUT = "/WEB-INF/jsp/cart/Checkout.jsp";
 
-  private Cart cart = new Cart();
-  private String workingItemId;
+    @SpringBean
+    private transient CatalogService catalogService;
 
-  public Cart getCart() {
-    return cart;
-  }
+    private Cart cart = new Cart();
 
-  public void setCart(Cart cart) {
-    this.cart = cart;
-  }
+    private String workingItemId;
 
-  public void setWorkingItemId(String workingItemId) {
-    this.workingItemId = workingItemId;
-  }
-
-  public Resolution addItemToCart() {
-    if (cart.containsItemId(workingItemId)) {
-      cart.incrementQuantityByItemId(workingItemId);
-    } else {
-      // isInStock is a "real-time" property that must be updated
-      // every time an item is added to the cart, even if other
-      // item details are cached.
-      boolean isInStock = catalogService.isItemInStock(workingItemId);
-      Item item = catalogService.getItem(workingItemId);
-      cart.addItem(item, isInStock);
+    public Cart getCart() {
+        return cart;
     }
 
-    return new ForwardResolution(VIEW_CART);
-  }
-
-  public Resolution removeItemFromCart() {
-
-    Item item = cart.removeItemById(workingItemId);
-
-    if (item == null) {
-      setMessage("Attempted to remove null CartItem from Cart.");
-      return new ForwardResolution(ERROR);
-    } else {
-      return new ForwardResolution(VIEW_CART);
+    public void setCart(Cart cart) {
+        this.cart = cart;
     }
-  }
 
-  public Resolution updateCartQuantities() {
-    HttpServletRequest request = context.getRequest();
+    public void setWorkingItemId(String workingItemId) {
+        this.workingItemId = workingItemId;
+    }
 
-    Iterator<CartItem> cartItems = getCart().getAllCartItems();
-    while (cartItems.hasNext()) {
-      CartItem cartItem = (CartItem) cartItems.next();
-      String itemId = cartItem.getItem().getItemId();
-      try {
-        int quantity = Integer.parseInt((String) request.getParameter(itemId));
-        getCart().setQuantityByItemId(itemId, quantity);
-        if (quantity < 1) {
-          cartItems.remove();
+    public Resolution addItemToCart() {
+        if (cart.containsItemId(workingItemId)) {
+            cart.incrementQuantityByItemId(workingItemId);
+        } else {
+            // isInStock is a "real-time" property that must be updated
+            // every time an item is added to the cart, even if other
+            // item details are cached.
+            boolean isInStock = catalogService.isItemInStock(workingItemId);
+            Item item = catalogService.getItem(workingItemId);
+            cart.addItem(item, isInStock);
         }
-      } catch (Exception e) {
-        //ignore parse exceptions on purpose
-      }
+
+        return new ForwardResolution(VIEW_CART);
     }
 
-    return new ForwardResolution(VIEW_CART);
-  }
+    public Resolution removeItemFromCart() {
 
-  public ForwardResolution viewCart() {
-    return new ForwardResolution(VIEW_CART);
-  }
+        Item item = cart.removeItemById(workingItemId);
 
-  public ForwardResolution checkOut() {
-    return new ForwardResolution(CHECK_OUT);
-  }
+        if (item == null) {
+            setMessage("Attempted to remove null CartItem from Cart.");
+            return new ForwardResolution(ERROR);
+        } else {
+            return new ForwardResolution(VIEW_CART);
+        }
+    }
 
-  public void clear() {
-    cart = new Cart();
-    workingItemId = null;
-  }
+    public Resolution updateCartQuantities() {
+        HttpServletRequest request = context.getRequest();
+
+        Iterator<CartItem> cartItems = getCart().getAllCartItems();
+        while (cartItems.hasNext()) {
+            CartItem cartItem = (CartItem) cartItems.next();
+            String itemId = cartItem.getItem().getItemId();
+            try {
+                int quantity = Integer.parseInt((String) request.getParameter(itemId));
+                getCart().setQuantityByItemId(itemId, quantity);
+                if (quantity < 1) {
+                    cartItems.remove();
+                }
+            } catch (Exception e) {
+                //ignore parse exceptions on purpose
+            }
+        }
+
+        return new ForwardResolution(VIEW_CART);
+    }
+
+    public ForwardResolution viewCart() {
+        return new ForwardResolution(VIEW_CART);
+    }
+
+    public ForwardResolution checkOut() {
+        return new ForwardResolution(CHECK_OUT);
+    }
+
+    public void clear() {
+        cart = new Cart();
+        workingItemId = null;
+    }
 
 }
